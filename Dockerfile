@@ -37,4 +37,3 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy actual app code (excluding media/static if you're mounting)
 COPY . .
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]

@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # custom apps
+    'user',
+    'book',
+    'core'
 
 ]
 
@@ -69,7 +73,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,6 +150,9 @@ SITE_NAME = "READERS PUBLICATION"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Custom User Model
+AUTH_USER_MODEL = 'user.User'
+ASGI_APPLICATION = 'whato.asgi.application'
 
 UNFOLD = {
     "SITE_TITLE": SITE_NAME,
