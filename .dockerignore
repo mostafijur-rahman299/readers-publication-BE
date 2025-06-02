@@ -13,6 +13,6 @@ venv/
 *.bak
 media/
 static/
-whato/media/
-whato/static/
+config/media/
+config/static/
 

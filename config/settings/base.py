@@ -15,6 +15,7 @@ from decouple import config
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.templatetags.static import static
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,14 +52,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # third party apps
+    'rest_framework',
+    'corsheaders',
+
     # custom apps
     'user',
     'book',
-    'core'
+    'core',
+    'order',
+    'payment',
+    'shipping',
+    'cart',
+    'author'
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -121,6 +132,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "user.authentication.CustomAuthBackend",
+]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -145,6 +172,10 @@ STATIC_URL = "/static/"
 
 SITE_NAME = "READERS PUBLICATION"
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -152,7 +183,47 @@ SITE_NAME = "READERS PUBLICATION"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'user.User'
-ASGI_APPLICATION = 'whato.asgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+# EMAIL
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="emailorproviderusername")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="emailpassword")
+EMAIL_USE_TLS = True
+FROM_EMAIL = config("FROM_EMAIL", default="test@gmail.com")
+
+# Celery Settings
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # or your broker URL
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'  # or your result backend
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_FILTER_BACKENDS": [
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+}
+
+if DEBUG:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"].append("rest_framework.renderers.BrowsableAPIRenderer")
+    
+# JWT configuration (optional)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5560),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=111),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+}
 
 UNFOLD = {
     "SITE_TITLE": SITE_NAME,
@@ -256,7 +327,7 @@ UNFOLD = {
                         "title": _("Users"),
                         "icon": "people",  # Supported icon set: https://fonts.google.com/icons
                         "link": reverse_lazy("admin:user_user_changelist"),
-                        # "badge": "whato.badge_callback",
+                        # "badge": "config.badge_callback",
                         "permission": lambda request: request.user.is_superuser,
                     }
                 ],

@@ -9,6 +9,7 @@ services:
       - .:/app
     depends_on:
       - db
+      - redis
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
       - DJANGO_SETTINGS_MODULE=config.settings
@@ -24,6 +25,20 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  celery:
+    build: .
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
