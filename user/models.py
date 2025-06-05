@@ -58,9 +58,8 @@ class User(BaseModel, AbstractUser):
 
     username = models.CharField(max_length=50)
     email = models.EmailField(db_collation="case_insensitive", unique=True)
-    phone_number = PhoneNumberField(null=True)
-    first_name = models.CharField(max_length=100, null=True)
-    last_name = models.CharField(max_length=100, null=True)
+    phone_number = PhoneNumberField(null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
     date_of_birth = models.DateField(null=True)
     
@@ -69,7 +68,7 @@ class User(BaseModel, AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.username if self.username else self.email.split('@')[0]
+        return self.full_name if self.full_name else self.email.split('@')[0]
 
 
 class UserProfile(BaseModel):

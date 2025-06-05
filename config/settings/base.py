@@ -133,7 +133,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "user.authentication.CustomAuthBackend",
+    # "user.authentication.CustomAuthBackend",  
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 
@@ -174,6 +175,7 @@ SITE_NAME = "READERS PUBLICATION"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 
