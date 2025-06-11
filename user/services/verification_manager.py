@@ -6,9 +6,12 @@ class VerificationManager:
         self.type = type
         self.kwargs = kwargs
 
-    def create_and_send_code(self, user):
-        code = self.service.generate_code()
-        self.service.send_code(**self.kwargs)
+    def create_and_send_code(self, user, code):
+        self.service.send_code(
+            user=user,
+            message=self.kwargs['message'],
+            to_numbers=self.kwargs['to_numbers']
+        )
         VerificationCode.objects.filter(user=user, type=self.type).delete()
         VerificationCode.objects.create(user=user, code=code, type=self.type)
 
