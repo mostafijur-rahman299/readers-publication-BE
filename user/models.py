@@ -112,4 +112,15 @@ class VerificationCode(BaseModel):
             self.TYPE_2FA: timedelta(minutes=5),
         }
         return timezone.now() > self.created_at + expiry_map[self.type]
+    
+    def verify_code(self, code_input):
+        if self.is_expired():
+            return False
+        if self.is_used:
+            return False
+        if self.code == code_input:
+            self.is_used = True
+            self.save()
+            return True
+        return False
 
