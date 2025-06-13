@@ -1,28 +1,34 @@
-
-
-.venv/
+# Ignore Python bytecode files
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.pyw
-*.pyz
-*.pywz
-*.pyzw
 
-.DS_Store
-*.egg
-*.egg-info/
-dist/
-build/
-.env
+# Ignore database files
+db.sqlite3
+
+# Ignore development server files
 *.log
-*.sqlite3
-*.db
-*.db-journal
-*.swp
-*.swo
-*.bak
-*.tmp
-*.orig
-*.coverage
+*.pot
+*.pyc
+
+# Ignore static files
+static_root/
+
+# Ignore secret settings file
+secrets.json
+
+# Ignore environment-specific settings
+.env
+
+# Ignore IDE and code editor settings (customize as needed)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+
+# Ignore dependency management files (customize as needed)
+venv/
+nginx/
+certbot/
+.DS_Store
+
+config/media/
