@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.models import Group
 
-from user.models import User
+from user.models import User, UserProfile
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from unfold.admin import ModelAdmin
 
@@ -23,7 +23,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'username', 'phone_number', 'gender', 'date_of_birth')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'full_name', 'username', 'phone_number', 'gender', 'date_of_birth')}),
         ('Registration', {'fields': ("is_email_verified",)}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
@@ -32,7 +32,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'username', 'first_name', 'last_name', 'phone_number'),
+            'fields': ('email', 'password1', 'password2', 'username', 'first_name', 'last_name', 'full_name', 'phone_number'),
         }),
     )
 
@@ -40,3 +40,9 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
 
+
+@admin.register(UserProfile)
+class UserProfileAdmin(ModelAdmin):
+    list_display = ('user', 'profile_picture', 'address', 'city', 'state', 'country', 'postal_code')
+    search_fields = ('user__email', 'user__username', 'address', 'city', 'state', 'country', 'postal_code')
+    ordering = ('user__email',)

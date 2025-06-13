@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -173,6 +173,7 @@ STATIC_URL = "/static/"
 
 SITE_NAME = "READERS PUBLICATION"
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -214,6 +215,8 @@ SMS_BROADCAST_TO_NUMBERS = [
 
 GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
 
+BACKEND_SITE_HOST = config("BACKEND_SITE_HOST")
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -230,8 +233,8 @@ if DEBUG:
     
 # JWT configuration (optional)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5560),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=111),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
