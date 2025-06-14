@@ -35,6 +35,7 @@ class Book(BaseModel):
     dimensions = models.CharField(max_length=50, blank=True, null=True)  # e.g., "5 x 8 inches"
     weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # in grams
     country = models.CharField(max_length=100, blank=True, null=True)  # Country of publication
+    is_new = models.BooleanField(default=False, help_text="Indicates if the book is new")
     
 
     def __str__(self):
@@ -64,6 +65,9 @@ class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    index_number = models.PositiveIntegerField(default=0, help_text="Used for ordering categories on the frontend")
+    is_featured = models.BooleanField(default=False, help_text="Indicates if the category is featured")
+    is_favorite = models.BooleanField(default=False, help_text="Indicates if the category is a favorite")
     is_active = models.BooleanField(default=True) 
 
     def __str__(self):
