@@ -12,8 +12,15 @@ class BaseModel(models.Model):
 
 class Carousel(BaseModel):
     title = models.CharField(max_length=255, blank=True, null=True)
+    title_bn = models.CharField(max_length=255, blank=True, null=True)
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    subtitle_bn = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='carousel_images/')
     link = models.URLField(blank=True, null=True)
+    index_number = models.PositiveIntegerField(default=0, help_text="Order of the carousel item")
+    is_active = models.BooleanField(default=True, help_text="Is the carousel item currently active?")
+    # This field is used to mark carousel items as advertisements
+    # Only up to 2 items can be marked as advertisements
     is_advertise = models.BooleanField(default=False)
 
     def __str__(self):
