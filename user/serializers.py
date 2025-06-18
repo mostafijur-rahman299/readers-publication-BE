@@ -1,7 +1,7 @@
 import phonenumbers
 from rest_framework import serializers
 from django.conf import settings
-from user.models import User, UserProfile
+from user.models import User, UserProfile, BookWishList
 from django.core.validators import EmailValidator
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -83,3 +83,19 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
 
     def get_profile_picture(self, instance):
         return settings.BACKEND_SITE_HOST + instance.profile_picture.url if instance.profile_picture else None
+    
+
+class UserBookWishListSerializerRead(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='book.id')
+    title = serializers.CharField(source='book.title')
+    author = serializers.CharField(source='book.author.full_name')
+    price = serializers.DecimalField(source='book.price', max_digits=10, decimal_places=2)
+    discount_price = serializers.DecimalField(source='book.discount_price', max_digits=10, decimal_places=2)
+    cover_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BookWishList
+        fields = ['id', 'title', 'author', 'cover_image', 'price', 'discount_price']
+
+    def get_cover_image(self, instance):
+        return settings.BACKEND_SITE_HOST + instance.book.cover_image.url if instance.book.cover_image else None

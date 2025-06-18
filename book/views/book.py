@@ -1,11 +1,10 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from book.models import Book, BookImage
-from book.serializers import BookSerializerListRead
+from rest_framework.generics import ListAPIView
+from book.models import Book
+from book.serializers.book import BookSerializerRead
 
-class BookViewSet(viewsets.ViewSet):
-    def list(self, request):
-        books = Book.objects.filter(is_active=True).order_by('index_number')
-        serializer = BookSerializer(books, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class BookListAPIView(ListAPIView):
+    serializer_class = BookSerializerRead
+    queryset = Book.objects.all()
+
+    def get_queryset(self):
+        return Book.objects.filter(status='published')

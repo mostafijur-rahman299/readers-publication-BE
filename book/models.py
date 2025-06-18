@@ -1,7 +1,7 @@
 from django.db import models
 from core.models import BaseModel
 from user.models import User
-
+from django.utils.text import slugify
 
 class Book(BaseModel):
     
@@ -12,14 +12,16 @@ class Book(BaseModel):
     )
     
     title = models.CharField(max_length=255)
+    title_bn = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     status = models.CharField(max_length=20, choices=STATUS, default='published')
-    sku = models.CharField(max_length=100, unique=True)
+    sku = models.CharField(max_length=100, null=True, blank=True, help_text="Stock Keeping Unit")
     description = models.TextField(blank=True, null=True)
     published_date = models.DateField()
-    isbn = models.CharField(max_length=13, unique=True)
+    isbn = models.CharField(max_length=13, null=True, blank=True, help_text="International Standard Book Number")
     pages = models.PositiveIntegerField()
-    cover_image = models.URLField(blank=True, null=True)
+    cover_image = models.ImageField(upload_to='book_images/', blank=True, null=True)
     is_available = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -35,7 +37,10 @@ class Book(BaseModel):
     dimensions = models.CharField(max_length=50, blank=True, null=True)  # e.g., "5 x 8 inches"
     weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # in grams
     country = models.CharField(max_length=100, blank=True, null=True)  # Country of publication
-    is_new = models.BooleanField(default=False, help_text="Indicates if the book is new")
+    is_new_arrival = models.BooleanField(default=False, help_text="If true, the book will be shown on the new arrival section")
+    is_favorite = models.BooleanField(default=False, help_text="If true, the book will be shown on the favorite section")
+    is_comming_soon = models.BooleanField(default=False, help_text="If true, the book will be shown on the comming soon section")
+    is_best_seller = models.BooleanField(default=False, help_text="If true, the book will be shown on the best seller section")
     
 
     def __str__(self):
@@ -63,15 +68,31 @@ class BookImage(BaseModel):
 
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
+    name_bn = models.CharField(max_length=100, blank=True, null=True, help_text="Bengali name of the category")
+    slug = models.SlugField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='category_images/', blank=True, null=True)
-    index_number = models.PositiveIntegerField(default=0, help_text="Used for ordering categories on the frontend")
-    is_featured = models.BooleanField(default=False, help_text="Indicates if the category is featured")
-    is_favorite = models.BooleanField(default=False, help_text="Indicates if the category is a favorite")
-    is_active = models.BooleanField(default=True) 
+    index_number = models.PositiveIntegerField(default=0) # for sorting
+    is_featured = models.BooleanField(default=False, help_text="Featured category will be shown on the home page")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ['index_number']
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            while True:
+                slug = slugify(self.name)
+                if not Category.objects.filter(slug=slug).exists():
+                    self.slug = slug
+                    break
+                self.name = f"{self.name} {Category.objects.filter(slug=slug).count() + 1}"
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Category"

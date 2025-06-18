@@ -347,6 +347,81 @@ UNFOLD = {
                     }
                 ],
             },
+            {
+                "title": _("Books"),
+                "separator": False,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Books"),
+                        "icon": "book",
+                        "link": reverse_lazy("admin:book_book_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Categories"),
+                        "icon": "category",
+                        "link": reverse_lazy("admin:book_category_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+            {
+                "title": _("Core"),
+                "separator": False,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Carousel"),
+                        "icon": "slideshow",
+                        "link": reverse_lazy("admin:core_carousel_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("General Data"),
+                        "icon": "settings",
+                        "link": reverse_lazy("admin:core_generaldata_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Country"),
+                        "icon": "public",
+                        "link": reverse_lazy("admin:core_country_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("State"),
+                        "icon": "location_city",
+                        "link": reverse_lazy("admin:core_state_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("City"),
+                        "icon": "location_city",
+                        "link": reverse_lazy("admin:core_city_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Thana"),
+                        "icon": "location_city",
+                        "link": reverse_lazy("admin:core_thana_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+            {
+                "title": _("Support"),
+                "separator": False,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Support"),
+                        "icon": "support_agent",
+                        "link": reverse_lazy("admin:core_support_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            }
         ],
     },
     "TABS": [
