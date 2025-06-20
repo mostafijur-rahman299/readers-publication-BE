@@ -1,6 +1,8 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Book, Category
+from .models import Book, Category, SpecialPackage, SpecialPackageBook
+from django import forms
+from django.forms.widgets import Select, Input
 
 @admin.register(Book)
 class BookAdmin(ModelAdmin):
@@ -24,5 +26,54 @@ class CategoryAdmin(ModelAdmin):
     search_fields = ('name', 'name_bn', 'slug')
     ordering = ('index_number',)
     list_filter = ('is_featured', 'is_active')
-    prepopulated_fields = {'slug': ('name',)}   
+    prepopulated_fields = {'slug': ('name',)}
 
+class SpecialPackageBookForm(forms.ModelForm):
+    class Meta:
+        model = SpecialPackageBook
+        fields = '__all__'
+        widgets = {
+            'book': Select(attrs={
+                "class": "w-full bg-gray-100 text-gray-900 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-md px-4 py-2"
+            }),
+            'index_number': Input(attrs={
+                "placeholder": "Enter Index Number",
+                "class": (
+                    "w-full bg-gray-100 text-gray-800 rounded-md "
+                    "px-4 py-2 border border-gray-300 shadow-sm "
+                    "focus:outline-none focus:ring-0 focus:border-none"
+                    "rounded-md"
+                ),
+                "type": "number",
+                "min": "0"
+            }),
+        }
+
+class SpecialPackageBookInline(admin.TabularInline):
+    model = SpecialPackageBook
+    form = SpecialPackageBookForm
+    extra = 1
+    autocomplete_fields = ['book']
+    show_change_link = True
+    classes = ['tab', 'shadow-md', 'rounded-xl', 'p-4', 'bg-gray-500']
+    fields = ["book", "index_number"]
+
+
+@admin.register(SpecialPackage)
+class SpecialPackageAdmin(ModelAdmin):
+    list_display = ('name', 'name_bn', 'index_number', 'is_active', 'is_featured', 'price')
+    list_filter = ('name', 'name_bn', 'is_active', 'is_featured')
+    list_editable = ('index_number', 'is_active', 'is_featured', 'price')
+    search_fields = ('name', 'name_bn')
+    ordering = ('index_number',)
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name', 'name_bn', 'description', 'description_bn', 'image',
+                'index_number', 'price', 'is_active', 'is_featured'
+            )
+        }),
+    )
+
+    inlines = [SpecialPackageBookInline]

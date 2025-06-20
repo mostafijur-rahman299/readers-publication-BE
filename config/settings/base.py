@@ -462,7 +462,21 @@ UNFOLD = {
                     }
                 ]
             },
-          
+            {
+                "title": _("Special Packages"),
+                "separator": False,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Special Packages"),
+                        "icon": "package",
+                        "link": reverse_lazy("admin:book_specialpackage_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+           
+            
         ],
     },
     "TABS": [

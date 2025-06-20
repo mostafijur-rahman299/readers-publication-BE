@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from core.models import BaseModel
 from user.models import User
@@ -109,3 +110,39 @@ class Tag(BaseModel):
         verbose_name = "Tag"
         verbose_name_plural = "Tags"
 
+
+class SpecialPackage(BaseModel):
+    uuid = models.UUIDField(editable=False, null=True, blank=True)
+    name = models.CharField(max_length=100, unique=True)
+    name_bn = models.CharField(max_length=100, blank=True, null=True, help_text="Bengali name of the special package")
+    description = models.TextField(blank=True, null=True)
+    description_bn = models.TextField(blank=True, null=True, help_text="Bengali description of the special package")
+    image = models.ImageField(upload_to='special_package_images/', blank=True, null=True)
+    index_number = models.PositiveIntegerField(default=0) # for sorting
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False, help_text="Featured special package will be shown on the home page")
+    books = models.ManyToManyField(Book, blank=True, through='SpecialPackageBook', related_name='special_packages')
+
+    class Meta:
+        verbose_name = "Special Package"
+        
+    def save(self, *args, **kwargs):
+        while True:
+            if not self.uuid:
+                self.uuid = uuid.uuid4()
+            if not SpecialPackage.objects.filter(uuid=self.uuid).exists():
+                break
+            self.uuid = uuid.uuid4()
+        super().save()
+
+
+class SpecialPackageBook(BaseModel):
+    package = models.ForeignKey(SpecialPackage, on_delete=models.CASCADE, related_name='package_books', null=True, blank=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='books', null=True)
+    index_number = models.PositiveIntegerField(default=0) # for sorting
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Special Package Book"
+        verbose_name_plural = "Special Package Books"
