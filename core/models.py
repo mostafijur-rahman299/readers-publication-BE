@@ -23,6 +23,9 @@ class Carousel(BaseModel):
     # Only up to 2 items can be marked as advertisements
     is_advertise = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['index_number']
+
     def __str__(self):
         return self.title if self.title else "Carousel Image"
 
@@ -38,13 +41,24 @@ class Carousel(BaseModel):
     
 
 class GeneralData(BaseModel):
+
+    # Social Media Links
     address = models.CharField(max_length=255, blank=True, null=True)
+    address_bn = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
     youtube = models.URLField(blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
+
+    # Articles
+    articles_section_title = models.CharField(max_length=255, blank=True, null=True)
+    articles_section_title_bn = models.CharField(max_length=255, blank=True, null=True)
+    articles_section_subtitle = models.CharField(max_length=255, blank=True, null=True)
+    articles_section_subtitle_bn = models.CharField(max_length=255, blank=True, null=True)
+    
 
     def __str__(self):
         return self.address if self.address else "General Data"
@@ -108,3 +122,20 @@ class Thana(BaseModel):
     class Meta:
         verbose_name = "Thana"
         verbose_name_plural = "Thanas"
+
+
+class Testimonial(BaseModel):
+    name = models.CharField(max_length=255, null=True)
+    name_bn = models.CharField(max_length=255, null=True, blank=True)
+    designation = models.CharField(max_length=255, null=True, blank=True)
+    designation_bn = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    city_bn = models.CharField(max_length=255, null=True, blank=True)
+    comment = models.TextField(null=True)
+    comment_bn = models.TextField(null=True)
+    rating = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='testimonials/', null=True, blank=True)
+
+    def __str__(self):
+        return self.name

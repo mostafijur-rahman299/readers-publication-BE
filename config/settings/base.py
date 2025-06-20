@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'corsheaders',
+    'django_ckeditor_5',
 
     # custom apps
     'user',
@@ -64,7 +65,8 @@ INSTALLED_APPS = [
     'payment',
     'shipping',
     'cart',
-    'author'
+    'author',
+    'blog',
 
 ]
 
@@ -165,6 +167,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated" # Possible values: "staff", "authenticated", "any"
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
@@ -238,6 +242,16 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
+}
+
+CKEDITOR_5_ALLOW_ALL_FILE_TYPES = True
+CKEDITOR_5_UPLOAD_FILE_TYPES = ['jpeg', 'pdf', 'png', 'jpg', 'webp'] # optional
+CKEDITOR_5_CONFIGS = {
+  'default': {
+      'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                  'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', 'fileUpload' ], # include fileUpload here
+      'language': 'en,bn',
+  },
 }
 
 UNFOLD = {
@@ -412,7 +426,7 @@ UNFOLD = {
             {
                 "title": _("Support"),
                 "separator": False,
-                "collapsible": True,
+                "collapsible": False,
                 "items": [
                     {
                         "title": _("Support"),
@@ -421,7 +435,34 @@ UNFOLD = {
                         "permission": lambda request: request.user.is_superuser,
                     }
                 ]
-            }
+            },
+            {
+                "title": _("Blog"),
+                "separator": False,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Blog"),
+                        "icon": "article",
+                        "link": reverse_lazy("admin:blog_blog_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+            {
+                "title": _("Testimonials"),
+                "separator": False,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Testimonials"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:core_testimonial_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+          
         ],
     },
     "TABS": [
