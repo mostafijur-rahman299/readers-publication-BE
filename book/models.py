@@ -3,6 +3,7 @@ from django.db import models
 from core.models import BaseModel
 from user.models import User
 from django.utils.text import slugify
+from author.models import Author
 
 class Book(BaseModel):
     
@@ -15,10 +16,11 @@ class Book(BaseModel):
     title = models.CharField(max_length=255)
     title_bn = models.CharField(max_length=255, blank=True, null=True)
     slug = models.SlugField(null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
-    status = models.CharField(max_length=20, choices=STATUS, default='published')
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, related_name='books', null=True)
+    status = models.CharField(max_length=20, choices=STATUS, default='draft')
     sku = models.CharField(max_length=100, null=True, blank=True, help_text="Stock Keeping Unit")
     description = models.TextField(blank=True, null=True)
+    description_bn = models.TextField(blank=True, null=True)
     published_date = models.DateField()
     isbn = models.CharField(max_length=13, null=True, blank=True, help_text="International Standard Book Number")
     pages = models.PositiveIntegerField()
@@ -31,17 +33,19 @@ class Book(BaseModel):
     rating_count = models.PositiveIntegerField(default=0)
     categories = models.ManyToManyField('Category', related_name='books', blank=True)
     tags = models.ManyToManyField('Tag', related_name='books', blank=True)
-    publisher = models.CharField(max_length=255, blank=True, null=True)
+    publisher_name = models.CharField(max_length=255, blank=True, null=True)
+    publisher_website_link = models.URLField(blank=True, null=True)
     translator = models.CharField(max_length=255, blank=True, null=True)
     edition = models.CharField(max_length=100, blank=True, null=True)
     language = models.CharField(max_length=50, blank=True, null=True)
-    dimensions = models.CharField(max_length=50, blank=True, null=True)  # e.g., "5 x 8 inches"
-    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # in grams
-    country = models.CharField(max_length=100, blank=True, null=True)  # Country of publication
+    dimensions = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., '5 x 8 inches'")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, help_text="in grams")
+    country = models.CharField(max_length=100, blank=True, null=True, help_text="Country of publication")
     is_new_arrival = models.BooleanField(default=False, help_text="If true, the book will be shown on the new arrival section")
-    is_favorite = models.BooleanField(default=False, help_text="If true, the book will be shown on the favorite section")
+    is_popular = models.BooleanField(default=False, help_text="If true, the book will be shown on the favorite section")
     is_comming_soon = models.BooleanField(default=False, help_text="If true, the book will be shown on the comming soon section")
     is_best_seller = models.BooleanField(default=False, help_text="If true, the book will be shown on the best seller section")
+    is_active = models.BooleanField(default=True)
     
 
     def __str__(self):
@@ -55,11 +59,18 @@ class Book(BaseModel):
 
 class BookImage(BaseModel):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='book_images/')
+    image = models.ImageField(upload_to='book_images/', null=True)
     alt_text = models.CharField(max_length=255, blank=True, null=True)
+    index_number = models.PositiveIntegerField(default=0) # for sorting
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Image for {self.book.title}"
+    
+    def save(self, *args, **kwargs):
+        if not self.index_number:
+            self.index_number = BookImage.objects.filter(book=self.book).count() + 1
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Book Image"

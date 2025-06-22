@@ -358,6 +358,12 @@ UNFOLD = {
                         "link": reverse_lazy("admin:user_user_changelist"),
                         # "badge": "config.badge_callback",
                         "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Authors"),
+                        "icon": "people",
+                        "link": reverse_lazy("admin:author_author_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
                     }
                 ],
             },

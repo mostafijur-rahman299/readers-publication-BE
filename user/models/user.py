@@ -66,7 +66,14 @@ class User(BaseModel, AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.full_name if self.full_name else self.email.split('@')[0]
+        return self.get_full_name()
+    
+    def get_full_name(self):
+        if self.full_name:
+            return self.full_name
+        elif self.username:
+            return self.username
+        return self.email.split('@')[0]
 
 
 class UserProfile(BaseModel):

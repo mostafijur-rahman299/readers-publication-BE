@@ -1,20 +1,40 @@
 from rest_framework import serializers
-from book.models import Book
+from book .models import Book, Category
 from django.conf import settings
 
-class BookSerializerRead(serializers.ModelSerializer):
-    author_name = serializers.CharField(source='author.name')
-    cover_image_url = serializers.SerializerMethodField()
-    discount_percentage = serializers.SerializerMethodField()
+class BookSerializerListRead(serializers.ModelSerializer):
+    cover_image = serializers.SerializerMethodField(required=False)
+    author_full_name = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields = ["title", "title_bn", "author_name", "price", "discounted_price", "cover_image_url", "rating", "rating_count", "discount_percentage", "is_available"]
+        fields = [
+            'id', 'title', 'title_bn', 'author_full_name', 'cover_image', 'price', 'discounted_price', "discount",
+            'rating', 'rating_count', 'is_available', "is_new_arrival", "is_popular", "is_comming_soon"
+        ]
 
-    def get_cover_image_url(self, obj):
-        return f"{settings.BACKEND_SITE_HOST}{obj.cover_image.url}" if obj.cover_image else ""
+    def get_cover_image(self, obj):
+        if obj.cover_image:
+            return f"{settings.BACKEND_SITE_HOST}{obj.cover_image.url}"
+        return None
 
-    def get_discount_percentage(self, obj):
-        if obj.discounted_price:
-            return int(((obj.price - obj.discounted_price) / obj.price) * 100)
-        return 0
+    def get_discount(self, obj):
+        if obj.discounted_price and obj.discounted_price < obj.price:
+            return round((obj.price - obj.discounted_price) / obj.price * 100, 2)
+        return 0.0
+    
+    def get_author_full_name(self, obj):
+        return obj.author.user.get_full_name()
+
+class CategorySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(required=False)
+
+    class Meta:
+        model = Category
+        fields =  ['name', 'description', 'image']  # or specify fields like ('id', 'name', 'description')
+
+    def get_image(self, obj):
+        if obj.image:
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        return None
