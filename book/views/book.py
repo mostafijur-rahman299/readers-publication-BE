@@ -15,7 +15,24 @@ class BookListAPIView(ListAPIView):
     def get_paginated_response(self, data):
         # If pagination is off, return all data in a single response
         is_pagination_off = self.request.query_params.get('pagination', 'true')
-        if is_pagination_off == 'false':
+        is_featured = self.request.query_params.get("is_featured")
+
+        # Home pase featured data
+        if is_pagination_off == 'false' and is_featured == "true":
+
+            qs = Book.objects.filter(is_active=True).order_by('-published_date')
+            new_arrival = qs.filter(is_new_arrival=True)
+            popular = qs.filter(is_popular=True)
+            comming_soon = qs.filter(is_comming_soon=True)
+            best_seller = qs.filter(is_best_seller=True)
+
+            data = {
+                "new_arrival": BookSerializerListRead(new_arrival, many=True).data,
+                "popular": BookSerializerListRead(popular, many=True).data,
+                "comming_soon": BookSerializerListRead(comming_soon, many=True).data,
+                "best_seller": BookSerializerListRead(best_seller, many=True).data,
+            }
+
             return Response(data)
         return super().get_paginated_response(data)
     

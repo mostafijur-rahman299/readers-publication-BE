@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from book .models import Book, Category
+from book.models import Book, Category
 from django.conf import settings
 
 class BookSerializerListRead(serializers.ModelSerializer):
