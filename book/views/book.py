@@ -10,8 +10,42 @@ class BookListAPIView(ListAPIView):
     pagination_class = GeneralPagination
 
     def get_queryset(self):
-        return Book.objects.filter(is_active=True).order_by('-published_date')
+        category = self.request.query_params.getlist("category[]")
+        author = self.request.query_params.getlist("author[]")
+        price_min = self.request.query_params.get("price[min]")
+        price_max = self.request.query_params.get("price[max]")
 
+        queryset = Book.objects.all()
+
+        # sort by
+        sort_by = self.request.query_params.get("sort_by")
+        if sort_by == "recent":
+            queryset = queryset.order_by('-published_date', '-created_at')
+        elif sort_by == "popular":
+            queryset = queryset.order_by('-rating', '-created_at')
+        elif sort_by == "price_low_to_high":
+            queryset = queryset.order_by('price')
+        elif sort_by == "price_high_to_low":
+            queryset = queryset.order_by('-price')
+
+
+        if category:
+            queryset = queryset.filter(categories__id__in=category).distinct()
+        if author:
+            queryset = queryset.filter(author__id__in=author).distinct()
+        if price_min and int(price_min) > 0:
+            price_min = int(price_min)
+            queryset = queryset.filter(price__gte=price_min).distinct()
+        if price_max and int(price_max) > 0:
+            price_max = int(price_max)
+            queryset = queryset.filter(price__lte=price_max).distinct()
+
+        return queryset.filter(is_active=True)
+    
+    def paginate_queryset(self, queryset):
+        self.pagination_class.page_size = 20
+        return super().paginate_queryset(queryset)
+    
     def get_paginated_response(self, data):
         # If pagination is off, return all data in a single response
         is_pagination_off = self.request.query_params.get('pagination', 'true')

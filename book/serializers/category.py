@@ -7,7 +7,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ["name", "name_bn", "description", "image_url", "slug", "index_number", "is_featured"]
+        fields = ["id", "name", "name_bn", "description", "image_url", "slug", "index_number", "is_featured"]
 
     def get_image_url(self, obj):
         return f"{settings.BACKEND_SITE_HOST}{obj.image.url}" if obj.image else ""
