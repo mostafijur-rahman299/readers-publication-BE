@@ -1,8 +1,9 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Book, Category, SpecialPackage, SpecialPackageBook, BookImage
+from .models import Book, Category, SpecialPackage, SpecialPackageBook, BookImage, BookPreview
 from django import forms
 from django.forms.widgets import Select, Input
+from django import forms
 
 class BookImageInline(admin.TabularInline):
     model = BookImage
@@ -10,7 +11,15 @@ class BookImageInline(admin.TabularInline):
     autocomplete_fields = ['book']
     show_change_link = True
     classes = ['tab', 'shadow-md', 'rounded-xl', 'p-4', 'bg-gray-500']
-    fields = ["image", "alt_text"]
+    fields = ["image", "alt_text", "index_number", "is_active"]
+
+class BookPreviewInline(admin.TabularInline):
+    model = BookPreview
+    extra = 1
+    autocomplete_fields = ['book']
+    show_change_link = True
+    classes = ['tab', 'shadow-md', 'rounded-xl', 'p-4', 'bg-gray-500']
+    fields = ["image", "index_number", "is_active"]
 
 
 @admin.register(Book)
@@ -23,13 +32,12 @@ class BookAdmin(ModelAdmin):
     list_editable = ('status', 'is_available', 'is_new_arrival', 'is_popular', 'is_comming_soon', 'is_best_seller', 'is_active')
     list_per_page = 10
     list_max_show_all = 100
-    search_fields = ('title', 'title_bn', 'sku', 'isbn', 'publisher', 'translator', 'edition', 'language', 'dimensions', 'weight', 'country')
+    search_fields = ('title', 'title_bn', 'sku', 'isbn', 'publisher_name', 'translator', 'edition', 'language', 'dimensions', 'weight', 'country')
     ordering = ('title',)
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [BookImageInline]
+    inlines = [BookImageInline, BookPreviewInline]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        from django import forms
         if db_field.name == "categories":
             kwargs['widget'] = forms.SelectMultiple(
                 attrs={
@@ -61,7 +69,7 @@ class BookAdmin(ModelAdmin):
             'fields': (
                 'is_new_arrival', 'is_popular', 'is_comming_soon', 'is_best_seller', 'is_active'
             )
-        }),
+        })
     )
 
 

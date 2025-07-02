@@ -1,6 +1,6 @@
-from rest_framework.generics import ListAPIView
-from book.models import Book
-from book.serializers.book import BookSerializerListRead
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from book.models import Book, BookPreview
+from book.serializers.book import BookSerializerListRead, BookSerializerDetailRead, BookPreviewSerializerListRead
 from core.pagination import GeneralPagination
 from rest_framework.response import Response
 
@@ -74,3 +74,22 @@ class BookListAPIView(ListAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
+
+class BookDetailAPIView(RetrieveAPIView):
+    serializer_class = BookSerializerDetailRead
+    queryset = Book.objects.all()
+    lookup_field = "slug"
+
+    def get_object(self):
+        return super().get_object()
+    
+
+class BookPreviewAPIView(ListAPIView):
+    serializer_class = BookPreviewSerializerListRead
+    queryset = BookPreview.objects.all()
+    pagination_class = GeneralPagination
+
+    def get_queryset(self): 
+        return BookPreview.objects.filter(book_id=self.kwargs['book_id'], is_active=True).order_by('index_number')
+

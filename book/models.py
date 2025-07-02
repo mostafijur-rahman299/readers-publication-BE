@@ -8,7 +8,7 @@ from author.models import Author
 class Book(BaseModel):
     
     STATUS = (
-        ('published', 'Published'),
+        ('published', 'Published'), 
         ('draft', 'Draft'),
         ('archived', 'Archived')
     )
@@ -54,7 +54,24 @@ class Book(BaseModel):
     class Meta:
         verbose_name = "Book"
         verbose_name_plural = "Books"
-        ordering = ['-published_date']  # Order by published date descending
+        ordering = ['-published_date']  
+        
+        
+class BookPreview(BaseModel):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='previews')
+    image = models.ImageField(upload_to='book_previews/', blank=True, null=True)
+    index_number = models.PositiveIntegerField(default=0) # for sorting
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Book Preview"
+        verbose_name_plural = "Book Previews"
+        ordering = ['index_number']
+
+    def save(self, *args, **kwargs):
+        if not self.index_number:
+            self.index_number = BookPreview.objects.filter(book=self.book).count() + 1
+        super().save(*args, **kwargs)
 
 
 class BookImage(BaseModel):
@@ -63,6 +80,11 @@ class BookImage(BaseModel):
     alt_text = models.CharField(max_length=255, blank=True, null=True)
     index_number = models.PositiveIntegerField(default=0) # for sorting
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Book Image"
+        verbose_name_plural = "Book Images"
+        ordering = ['index_number']
 
     def __str__(self):
         return f"Image for {self.book.title}"

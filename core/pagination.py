@@ -7,8 +7,8 @@ class GeneralPagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
         return Response({
-            'count': self.page.paginator.count,
-            'page_number': self.page.number,
+            'count': self.page.paginator.count, # total number of items in the database
+            'current_page': self.page.number,
             'page_range': list(self.page.paginator.page_range),
             'results': data
         })

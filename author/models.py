@@ -27,3 +27,15 @@ class Author(BaseModel):
         verbose_name = "Author"
         verbose_name_plural = "Authors"
 
+class AuthorTag(BaseModel):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='tags')
+    name = models.CharField(max_length=100, unique=True)
+    name_bn = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Author Tag"
+        verbose_name_plural = "Author Tags"
