@@ -483,6 +483,20 @@ UNFOLD = {
                     }
                 ]
             },
+            {
+                "title": _("Cart"),
+                "separator": False,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Cart"),
+                        "icon": "shopping_cart",
+                        "link": reverse_lazy("admin:cart_cart_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
+            
            
             
         ],

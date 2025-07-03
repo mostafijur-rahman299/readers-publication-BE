@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from book.models import Book, Category, BookImage, BookPreview
+from book.models import Book, Category, BookImage, BookPreview, BookReview
 from django.conf import settings
 
 class BookSerializerListRead(serializers.ModelSerializer):
@@ -130,3 +130,27 @@ class BookPreviewSerializerListRead(serializers.ModelSerializer):
             return f"{settings.BACKEND_SITE_HOST}{obj.image.url}"
         return None
     
+
+class BookReviewSerializerListRead(serializers.ModelSerializer):
+    user_details = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+    class Meta:
+        model = BookReview
+        fields = ['id', 'review', 'rating', 'user_details', 'created_at']
+
+    def get_user_details(self, obj):
+        return {
+            "id": obj.user.id,
+            "name": obj.user.full_name,
+            "profile_picture": f"{settings.BACKEND_SITE_HOST}{obj.user.profile.profile_picture.url}" if hasattr(obj.user, 'profile') and obj.user.profile.profile_picture else None,
+        }
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime("%d %b %Y, %I:%M %p")
+
+
+class BookReviewSerializerCreate(serializers.ModelSerializer):
+    class Meta:
+        model = BookReview
+        fields = ['review', 'rating']
+

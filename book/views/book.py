@@ -1,8 +1,11 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from book.models import Book, BookPreview
-from book.serializers.book import BookSerializerListRead, BookSerializerDetailRead, BookPreviewSerializerListRead
+from book.serializers.book import BookSerializerListRead, BookSerializerDetailRead, BookPreviewSerializerListRead, BookReviewSerializerListRead, BookReviewSerializerCreate
 from core.pagination import GeneralPagination
 from rest_framework.response import Response
+from book.models import BookReview
+from rest_framework.decorators import api_view
+from django.db.models import Q
 
 class BookListAPIView(ListAPIView):
     serializer_class = BookSerializerListRead
@@ -92,4 +95,67 @@ class BookPreviewAPIView(ListAPIView):
 
     def get_queryset(self): 
         return BookPreview.objects.filter(book_id=self.kwargs['book_id'], is_active=True).order_by('index_number')
+    
+
+class BookReviewAPIView(ListAPIView):
+    serializer_class = BookReviewSerializerListRead
+    queryset = BookReview.objects.all()
+    pagination_class = GeneralPagination
+
+    def get_queryset(self):
+        return BookReview.objects.filter(book_id=self.kwargs['book_id'], is_active=True).order_by('-created_at')
+    
+    def paginate_queryset(self, queryset):
+        self.pagination_class.page_size = 5
+        return super().paginate_queryset(queryset)
+
+class BookReviewCreateAPIView(CreateAPIView):
+    serializer_class = BookReviewSerializerCreate
+    queryset = BookReview.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, book=self.kwargs['book_id'])
+
+
+@api_view(['GET'])
+def get_book_review_distribution(request, book_id):
+    reviews = BookReview.objects.filter(book_id=book_id, is_active=True).values('rating')
+    
+    return Response({
+        "1": reviews.filter(rating=1).count(),
+        "2": reviews.filter(rating=2).count(),
+        "3": reviews.filter(rating=3).count(),
+        "4": reviews.filter(rating=4).count(),
+        "5": reviews.filter(rating=5).count(),
+        "total": reviews.count(),
+    })
+
+
+class BookRelatedAPIView(ListAPIView):
+    serializer_class = BookSerializerListRead
+    queryset = Book.objects.all()
+    
+    def get_queryset(self):
+        book_id = self.request.query_params.get('book_id')
+        book = Book.objects.get(id=book_id)
+        categories = book.categories.all()
+        author = book.author
+        publisher_name = book.publisher_name
+        title = book.title
+
+        related_books = Book.objects.filter(
+            Q(is_active=True) &
+            Q(categories__id__in=categories) |
+            Q(author=author) |
+            Q(publisher_name=publisher_name) |
+            Q(title__icontains=title)
+        ).order_by('-published_date').distinct()
+
+        # if related books are less than 10, add more books
+        if related_books.count() < 10:
+            books = Book.objects.filter(is_active=True, id__not_in=related_books.values_list('id', flat=True)).order_by('-published_date')[:10]
+            related_books = related_books | books
+        
+        return related_books[:10]
+
 

@@ -4,6 +4,8 @@ from core.models import BaseModel
 from user.models import User
 from django.utils.text import slugify
 from author.models import Author
+from django.core.exceptions import ValidationError
+from django_ckeditor_5.fields import CKEditor5Field
 
 class Book(BaseModel):
     
@@ -19,8 +21,8 @@ class Book(BaseModel):
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, related_name='books', null=True)
     status = models.CharField(max_length=20, choices=STATUS, default='draft')
     sku = models.CharField(max_length=100, null=True, blank=True, help_text="Stock Keeping Unit")
-    description = models.TextField(blank=True, null=True)
-    description_bn = models.TextField(blank=True, null=True)
+    description = CKEditor5Field(blank=True, null=True)
+    description_bn = CKEditor5Field(blank=True, null=True)
     published_date = models.DateField()
     isbn = models.CharField(max_length=13, null=True, blank=True, help_text="International Standard Book Number")
     pages = models.PositiveIntegerField()
@@ -179,3 +181,23 @@ class SpecialPackageBook(BaseModel):
     class Meta:
         verbose_name = "Special Package Book"
         verbose_name_plural = "Special Package Books"
+
+
+class BookReview(BaseModel):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    review = models.TextField(null=True, blank=True)
+    rating = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Book Review"
+        verbose_name_plural = "Book Reviews"
+        ordering = ['-created_at']
+
+    def clean(self):
+        if self.rating < 1 or self.rating > 5:
+            raise ValidationError("Rating must be between 1 and 5")
+        
+        if BookReview.objects.filter(book=self.book, user=self.user).exists():
+            raise ValidationError("You have already reviewed this book")

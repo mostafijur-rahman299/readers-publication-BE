@@ -69,6 +69,11 @@ class BookAdmin(ModelAdmin):
             'fields': (
                 'is_new_arrival', 'is_popular', 'is_comming_soon', 'is_best_seller', 'is_active'
             )
+        }),
+        ('Rating', {
+            'fields': (
+                'rating', 'rating_count'
+            )
         })
     )
 

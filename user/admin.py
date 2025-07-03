@@ -43,6 +43,6 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(ModelAdmin):
-    list_display = ('user', 'profile_picture', 'address', 'city', 'state', 'country', 'postal_code')
+    list_display = ('user', 'address', 'city', 'state', 'country', 'postal_code')
     search_fields = ('user__email', 'user__username', 'address', 'city', 'state', 'country', 'postal_code')
     ordering = ('user__email',)
