@@ -5,9 +5,8 @@ from django.core.exceptions import ValidationError
 
 @admin.register(Carousel)
 class CarouselAdmin(ModelAdmin):
-    list_display = ['title', 'title_bn', 'subtitle', 'subtitle_bn', 'image', 'link', 'index_number', 'is_advertise', 'is_active']
-    list_editable = ['is_advertise', 'index_number', 'is_active']
-    list_filter = ['is_advertise']
+    list_display = ['title', 'title_bn', 'subtitle', 'subtitle_bn', 'image', 'link', 'index_number', 'is_active']
+    list_editable = ['index_number', 'is_active']
     search_fields = ['title', 'title_bn', 'subtitle', 'subtitle_bn']
     list_per_page = 10
 
@@ -19,13 +18,16 @@ class CarouselAdmin(ModelAdmin):
 
 @admin.register(GeneralData)
 class GeneralDataAdmin(ModelAdmin):
-    list_display = ['address', "address_bn", 'phone']
+    list_display = ['address', "address_bn", 'phone', 'delivery_charge']
     fieldsets = (
         ("Contact Information", {
             'fields': ('address', 'address_bn',  'phone', 'email', 'facebook', 'twitter', 'instagram', 'youtube', 'linkedin')
         }),
         ('Home Page Articles Section', {
             'fields': ('articles_section_title', 'articles_section_title_bn', 'articles_section_subtitle', 'articles_section_subtitle_bn')
+        }),
+        ('Delivery Charge', {
+            'fields': ('delivery_charge',)
         })
     )
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 from core.models import BaseModel
 from user.models import User
@@ -8,6 +9,7 @@ class Author(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='author', null=True, blank=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     name_bn = models.CharField(max_length=100, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phone_number = PhoneNumberField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
@@ -22,6 +24,13 @@ class Author(BaseModel):
 
     def __str__(self): 
         return self.name or self.user.get_full_name()
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            while Author.objects.filter(slug=self.slug).exists():
+                self.slug = f"{self.slug}-{Author.objects.filter(slug=self.slug).count() + 1}"
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Author"

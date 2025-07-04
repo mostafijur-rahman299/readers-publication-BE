@@ -21,7 +21,7 @@ class Carousel(BaseModel):
     is_active = models.BooleanField(default=True, help_text="Is the carousel item currently active?")
     # This field is used to mark carousel items as advertisements
     # Only up to 2 items can be marked as advertisements
-    is_advertise = models.BooleanField(default=False)
+    # is_advertise = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['index_number']
@@ -34,10 +34,10 @@ class Carousel(BaseModel):
         verbose_name_plural = "Carousels"
         ordering = ['-created_at']  # Order by creation date descending
         
-    def clean(self):
-        if Carousel.objects.filter(is_advertise=True).count() > 2 and self.is_advertise:
-            raise ValueError("Only up to 2 carousel items can be marked as advertisements.")
-        return super().clean()
+    # def clean(self):
+    #     if Carousel.objects.filter(is_advertise=True).count() > 2 and self.is_advertise:
+    #         raise ValueError("Only up to 2 carousel items can be marked as advertisements.")
+    #     return super().clean()
     
 
 class GeneralData(BaseModel):
@@ -58,6 +58,9 @@ class GeneralData(BaseModel):
     articles_section_title_bn = models.CharField(max_length=255, blank=True, null=True)
     articles_section_subtitle = models.CharField(max_length=255, blank=True, null=True)
     articles_section_subtitle_bn = models.CharField(max_length=255, blank=True, null=True)
+
+    # Delivery Charge
+    delivery_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
 
     def __str__(self):

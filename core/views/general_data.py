@@ -14,6 +14,7 @@ def get_general_data(request):
             "contact_phone": general_data.phone,
             "address": general_data.address,
             "address_bn": general_data.address_bn,
+            "delivery_charge": general_data.delivery_charge,
             "social_links": {
                 "facebook": general_data.facebook,
                 "twitter": general_data.twitter,

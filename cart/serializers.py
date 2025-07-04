@@ -33,5 +33,6 @@ class CartSerializerRead(serializers.ModelSerializer):
             'id': obj.book.author.id,
             'name': obj.book.author.name,
             'name_bn': obj.book.author.name_bn,
+            'slug': obj.book.author.slug,
         }
     
