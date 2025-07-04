@@ -7,13 +7,13 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 
 class CartView(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Cart.objects.all()
     serializer_class = CartSerializerRead
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        return Cart.objects.filter(is_active=True)
+        return Cart.objects.filter(is_active=True, user=self.request.user)
 
     def get_serializer_class(self):
         return CartSerializerRead

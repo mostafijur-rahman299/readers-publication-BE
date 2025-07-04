@@ -13,7 +13,7 @@ class CarouselSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Carousel
-        fields = ['title', 'title_bn', 'subtitle', 'subtitle_bn', 'image_url', 'link', 'is_advertise']
+        fields = ['title', 'title_bn', 'subtitle', 'subtitle_bn', 'image_url', 'link']
 
     def get_image_url(self, obj):
         return f"{settings.BACKEND_SITE_HOST}{obj.image.url}" if obj.image else ""
