@@ -67,10 +67,11 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
     joined_at = serializers.SerializerMethodField()
     profile_picture = serializers.SerializerMethodField()
     cart_count = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
     
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'address', 'full_name', 'email', 'phone_number', 'joined_at', 'profile_picture', 'cart_count']
+        fields = ['id', 'user_id', 'profile_picture', 'address', 'full_name', 'email', 'phone_number', 'joined_at', 'profile_picture', 'cart_count']
 
     def get_full_name(self, instance):
         return instance.user.full_name if instance.user.full_name else instance.user.username or instance.user.email.split('@')[0]
@@ -90,6 +91,8 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
     def get_cart_count(self, instance):
         return Cart.objects.filter(user=instance.user, is_active=True).count()
     
+    def get_user_id(self, instance):
+        return instance.user.id
 
 class UserBookWishListSerializerRead(serializers.ModelSerializer):
     id = serializers.IntegerField(source='book.id')

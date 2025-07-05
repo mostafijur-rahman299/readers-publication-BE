@@ -1,5 +1,5 @@
 from cart.models import Cart
-from cart.serializers import CartSerializerRead
+from cart.serializers import CartSerializerRead, CartSerializerCreate
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -16,6 +16,8 @@ class CartView(viewsets.ModelViewSet):
         return Cart.objects.filter(is_active=True, user=self.request.user)
 
     def get_serializer_class(self):
+        if self.action == 'create':
+            return CartSerializerCreate
         return CartSerializerRead
 
     @action(detail=True, methods=['patch'])

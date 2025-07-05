@@ -83,6 +83,7 @@ class BookSerializerDetailRead(serializers.ModelSerializer):
     def get_author(self, obj):
         return {
             "id": obj.author.id,
+            "slug": obj.author.slug,
             "name": obj.author.name,
             "name_bn": obj.author.name_bn,
             "bio": obj.author.bio,
