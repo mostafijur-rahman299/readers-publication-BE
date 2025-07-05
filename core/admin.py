@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Carousel, GeneralData, Support, Country, State, City, Thana, Testimonial
+from .models import Carousel, GeneralData, Support, Country, State, City, Thana, Union, Testimonial
 from django.core.exceptions import ValidationError
 
 @admin.register(Carousel)
@@ -50,26 +50,33 @@ class SupportAdmin(ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(ModelAdmin):
-    list_display = ['name', 'code', 'flag']
+    list_display = ['name', 'name_bn', 'code', 'flag']
     list_per_page = 10
 
 
 @admin.register(State)
 class StateAdmin(ModelAdmin):
-    list_display = ['name', 'country']
+    list_display = ['name', 'name_bn', 'country']
     list_per_page = 10
 
 
 @admin.register(City)
 class CityAdmin(ModelAdmin):
-    list_display = ['name', 'state']
+    list_display = ['name', 'name_bn', 'state']
     list_per_page = 10
 
 
 @admin.register(Thana)
 class ThanaAdmin(ModelAdmin):
-    list_display = ['name', 'city'] 
+    list_display = ['name', 'name_bn', 'city'] 
     list_per_page = 10
+
+
+@admin.register(Union)
+class UnionAdmin(ModelAdmin):
+    list_display = ['name', 'name_bn', 'thana']
+    list_per_page = 10
+
 
 
 @admin.register(Testimonial)

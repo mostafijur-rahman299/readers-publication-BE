@@ -83,6 +83,7 @@ class Support(BaseModel):
 
 class Country(BaseModel):
     name = models.CharField(max_length=255, null=True)
+    name_bn = models.CharField(max_length=255, null=True)
     code = models.CharField(max_length=255, null=True)
     flag = models.ImageField(upload_to='country_flags/', null=True, blank=True)
 
@@ -95,6 +96,7 @@ class Country(BaseModel):
 
 class State(BaseModel):
     name = models.CharField(max_length=255, null=True)
+    name_bn = models.CharField(max_length=255, null=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
 
     def __str__(self):
@@ -106,7 +108,8 @@ class State(BaseModel):
 
 class City(BaseModel):
     name = models.CharField(max_length=255, null=True)
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities', null=True, blank=True)
+    name_bn = models.CharField(max_length=255, null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities', null=True)
 
     def __str__(self):
         return self.name
@@ -117,7 +120,8 @@ class City(BaseModel):
 
 class Thana(BaseModel):
     name = models.CharField(max_length=255, null=True)
-    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='thanas', null=True, blank=True)
+    name_bn = models.CharField(max_length=255, null=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='thanas', null=True)
 
     def __str__(self):
         return self.name
@@ -126,6 +130,17 @@ class Thana(BaseModel):
         verbose_name = "Thana"
         verbose_name_plural = "Thanas"
 
+class Union(BaseModel):
+    name = models.CharField(max_length=255, null=True)
+    name_bn = models.CharField(max_length=255, null=True)
+    thana = models.ForeignKey(Thana, on_delete=models.CASCADE, related_name='unions', null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Union"
+        verbose_name_plural = "Unions"
 
 class Testimonial(BaseModel):
     name = models.CharField(max_length=255, null=True)

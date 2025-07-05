@@ -8,12 +8,13 @@ class BookSerializerListRead(serializers.ModelSerializer):
     author_full_name_bn = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     discounted_price = serializers.SerializerMethodField()
-
+    author_id = serializers.SerializerMethodField()
+    author_slug = serializers.SerializerMethodField()
     class Meta:
         model = Book
         fields = [
             'id', 'slug', 'title', 'title_bn', 'author_full_name', 'author_full_name_bn', 'cover_image', 'price', 'discounted_price',
-            'rating', 'rating_count', 'is_available', "is_new_arrival", "is_popular", "is_comming_soon"
+            'rating', 'rating_count', 'is_available', "is_new_arrival", "is_popular", "is_comming_soon", "author_id", "author_slug"
         ]
 
     def get_cover_image(self, obj):
@@ -33,7 +34,12 @@ class BookSerializerListRead(serializers.ModelSerializer):
     def get_discounted_price(self, obj):
         return int(obj.discounted_price) if obj.discounted_price else None
     
-
+    def get_author_id(self, obj):
+        return obj.author.id
+    
+    def get_author_slug(self, obj):
+        return obj.author.slug
+    
 class BookImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(required=False)
     

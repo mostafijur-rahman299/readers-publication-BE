@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from core.models import GeneralData
+from core.models import GeneralData, State, City, Thana, Union
 
 @api_view(['GET'])
 def get_general_data(request):
@@ -31,3 +31,40 @@ def get_general_data(request):
         }, status=status.HTTP_200_OK)
     except GeneralData.DoesNotExist:
         return Response({"error": "General data not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def get_state_list(request):
+    try:
+        state_list = State.objects.all().values('id', 'name', 'name_bn')
+        return Response(state_list, status=status.HTTP_200_OK)
+    except State.DoesNotExist:
+        return Response({"error": "State list not found"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_city_list(request):
+    try:
+        state_id = request.GET.get('state_id')
+        city_list = City.objects.filter(state_id=state_id).values('id', 'name', 'name_bn')
+        return Response(city_list, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_thana_list(request):
+    try:
+        city_id = request.GET.get('city_id')
+        thana_list = Thana.objects.filter(city_id=city_id).values('id', 'name', 'name_bn')
+        return Response(thana_list, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_union_list(request):
+    try:
+        thana_id = request.GET.get('thana_id')
+        union_list = Union.objects.filter(thana_id=thana_id).values('id', 'name', 'name_bn')
+        return Response(union_list, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
