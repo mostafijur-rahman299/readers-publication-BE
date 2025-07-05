@@ -5,7 +5,11 @@ from django.conf import settings
 class CartSerializerCreate(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['user', 'book', 'quantity']
+        fields = ['uuid', 'user', 'book', 'quantity']
+
+        extra_kwargs = {
+            'uuid': {'read_only': True},
+        }
 
     def create(self, validated_data):
         user = validated_data.get('user')

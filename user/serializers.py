@@ -66,12 +66,12 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
     joined_at = serializers.SerializerMethodField()
     profile_picture = serializers.SerializerMethodField()
-    cart_count = serializers.SerializerMethodField()
+    cart_items = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
     
     class Meta:
         model = UserProfile
-        fields = ['id', 'user_id', 'profile_picture', 'address', 'full_name', 'email', 'phone_number', 'joined_at', 'profile_picture', 'cart_count']
+        fields = ['id', 'user_id', 'profile_picture', 'address', 'full_name', 'email', 'phone_number', 'joined_at', 'profile_picture', 'cart_items']
 
     def get_full_name(self, instance):
         return instance.user.full_name if instance.user.full_name else instance.user.username or instance.user.email.split('@')[0]
@@ -88,8 +88,16 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
     def get_profile_picture(self, instance):
         return settings.BACKEND_SITE_HOST + instance.profile_picture.url if instance.profile_picture else None
     
-    def get_cart_count(self, instance):
-        return Cart.objects.filter(user=instance.user, is_active=True).count()
+    def get_cart_items(self, instance):
+        items = Cart.objects.filter(user=instance.user, is_active=True)
+        cart_items = []
+        for item in items:
+            cart_items.append({
+                "uuid": item.uuid,
+                "book_id": item.book.id,
+                "quantity": item.quantity            
+            })
+        return cart_items
     
     def get_user_id(self, instance):
         return instance.user.id
