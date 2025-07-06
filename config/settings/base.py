@@ -486,12 +486,18 @@ UNFOLD = {
             {
                 "title": _("Cart"),
                 "separator": False,
-                "collapsible": False,
+                "collapsible": True,
                 "items": [
                     {
                         "title": _("Cart"),
                         "icon": "shopping_cart",
                         "link": reverse_lazy("admin:cart_cart_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Shipping Address"),
+                        "icon": "location_city",
+                        "link": reverse_lazy("admin:shipping_shipping_changelist"),
                         "permission": lambda request: request.user.is_superuser,
                     }
                 ]

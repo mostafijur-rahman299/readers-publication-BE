@@ -5,6 +5,14 @@ from user.models import User
 
 
 class Shipping(BaseModel):
+
+    ADDRESS_TYPE_CHOICES = [
+        ('HOME', 'home'),
+        ('OFFICE', 'office'),
+        ('OTHER', 'other'),
+    ]
+
+    address_type = models.CharField(max_length=100, blank=True, null=True, choices=ADDRESS_TYPE_CHOICES)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shipping', null=True, blank=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=100, blank=True, null=True)
@@ -18,7 +26,7 @@ class Shipping(BaseModel):
     is_default = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {self.name}" if self.user else str(self.name)
 
     class Meta:
         verbose_name = "Shipping"
