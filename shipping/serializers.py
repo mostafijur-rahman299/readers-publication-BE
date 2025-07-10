@@ -4,12 +4,14 @@ from .models import Shipping
 class ShippingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipping
-        fields = ['name', 'phone', 'email', 'state', 'city', 'thana', 'note', 'detail_address', 'is_default', 'address_type']
+        fields = ['id', 'name', 'phone', 'email', 'state', 'city', 'thana', 'union', 'note', 'detail_address', 'is_default', 'address_type']
 
         extra_kwargs = {
+            'id': {'read_only': True},
             'state': {'required': True, 'allow_null': False},
             'city': {'required': True, 'allow_null': False},
             'thana': {'required': True, 'allow_null': False},
+            'union': {'required': True, 'allow_null': False},
             'detail_address': {'required': True, 'allow_null': False},
             'note': {'required': False, 'allow_null': True},
             'is_default': {'required': False, 'allow_null': True},
@@ -21,14 +23,54 @@ class ShippingCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
+
+        # Rest of them would be false
+        if validated_data.get('is_default'):
+            Shipping.objects.filter(user=validated_data['user']).update(is_default=False)
+
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        if validated_data.get('is_default'):
+            Shipping.objects.filter(user=instance.user).update(is_default=False)
+
+        return super().update(instance, validated_data)
 
 class ShippingReadSerializer(serializers.ModelSerializer):
-    state = serializers.CharField(source='state.name', read_only=True)
-    city = serializers.CharField(source='city.name', read_only=True)
-    thana = serializers.CharField(source='thana.name', read_only=True)
-    address_type = serializers.CharField(source='get_address_type_display', read_only=True)
+    state = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
+    thana = serializers.SerializerMethodField()
+    union = serializers.SerializerMethodField()
     
     class Meta:
         model = Shipping
-        fields = ['name', 'phone', 'email', 'state', 'city', 'thana', 'detail_address', 'note', 'is_default', 'address_type']
+        fields = ['id', 'name', 'phone', 'email', 'state', 'city', 'thana', 'union', 'detail_address', 'note', 'is_default', 'address_type']
+
+    def get_state(self, obj):
+        return {
+            "id": obj.state.id,
+            "name": obj.state.name,
+            "name_bn": obj.state.name_bn,
+        }
+
+    def get_city(self, obj):
+        return {
+            "id": obj.city.id,
+            "name": obj.city.name,
+            "name_bn": obj.city.name_bn,
+        }
+
+    def get_thana(self, obj):
+        return {
+            "id": obj.thana.id,
+            "name": obj.thana.name,
+            "name_bn": obj.thana.name_bn,
+        }
+
+    def get_union(self, obj):
+        return {
+            "id": obj.union.id,
+            "name": obj.union.name,
+            "name_bn": obj.union.name_bn,
+        }
+

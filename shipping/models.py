@@ -1,15 +1,15 @@
 from django.db import models
 
-from core.models import BaseModel, Country, State, City, Thana
+from core.models import BaseModel, Country, State, City, Thana, Union
 from user.models import User
 
 
 class Shipping(BaseModel):
 
     ADDRESS_TYPE_CHOICES = [
-        ('HOME', 'home'),
-        ('OFFICE', 'office'),
-        ('OTHER', 'other'),
+        ('home', 'Home'),
+        ('office', 'Office'),
+        ('other', 'Other'),
     ]
 
     address_type = models.CharField(max_length=100, blank=True, null=True, choices=ADDRESS_TYPE_CHOICES)
@@ -21,9 +21,11 @@ class Shipping(BaseModel):
     state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='shipping', null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='shipping', null=True, blank=True)
     thana = models.ForeignKey(Thana, on_delete=models.CASCADE, related_name='shipping', null=True, blank=True)
+    union = models.ForeignKey(Union, on_delete=models.CASCADE, related_name='shipping', null=True, blank=True)
     detail_address = models.CharField(max_length=255, blank=True, null=True)
     note = models.TextField(blank=True, null=True)
     is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.name}" if self.user else str(self.name)
