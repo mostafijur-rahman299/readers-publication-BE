@@ -38,3 +38,18 @@ class CartView(viewsets.ModelViewSet):
             return Response(CartSerializerRead(cart).data, status=status.HTTP_200_OK)
 
         return Response({'error': 'Quantity is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'])
+    def update_checkout_selection_status(self, request):
+        try:
+            cart_ids = request.data.get('cart_ids')
+            is_selected = request.data.get('is_selected')
+            carts = []
+            for cart_id in cart_ids:
+                cart = get_object_or_404(Cart, uuid=cart_id, is_active=True)
+                cart.is_selected = is_selected
+                carts.append(cart)
+            Cart.objects.bulk_update(carts, ['is_selected'])
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

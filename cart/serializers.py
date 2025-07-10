@@ -36,6 +36,7 @@ class CartSerializerRead(serializers.ModelSerializer):
             'quantity',
             'book_details',
             'author_details',
+            'is_selected',
         ]
 
     def get_book_details(self, obj):
