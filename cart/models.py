@@ -9,7 +9,6 @@ class Cart(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='cart')
     quantity = models.PositiveIntegerField(default=1)
-    is_active = models.BooleanField(default=True)
     is_selected = models.BooleanField(default=False)
 
     def __str__(self):

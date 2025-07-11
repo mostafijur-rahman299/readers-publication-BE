@@ -89,7 +89,7 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
         return settings.BACKEND_SITE_HOST + instance.profile_picture.url if instance.profile_picture else None
     
     def get_cart_items(self, instance):
-        items = Cart.objects.filter(user=instance.user, is_active=True)
+        items = Cart.objects.filter(user=instance.user)
         cart_items = []
         for item in items:
             cart_items.append({

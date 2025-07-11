@@ -8,12 +8,14 @@ from django.shortcuts import get_object_or_404
 
 class CartView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Cart.objects.all()
+    queryset = Cart.objects.filter()
     serializer_class = CartSerializerRead
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        return Cart.objects.filter(is_active=True, user=self.request.user)
+        if self.request.query_params.get('is_selected'):
+            return Cart.objects.filter(user=self.request.user, is_selected=True)
+        return Cart.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -22,7 +24,7 @@ class CartView(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def update_quantity(self, request, uuid=None):
-        cart = get_object_or_404(Cart, uuid=uuid, is_active=True)
+        cart = get_object_or_404(Cart, uuid=uuid)
 
         quantity = request.data.get('quantity')
         if quantity is not None:
@@ -46,7 +48,7 @@ class CartView(viewsets.ModelViewSet):
             is_selected = request.data.get('is_selected')
             carts = []
             for cart_id in cart_ids:
-                cart = get_object_or_404(Cart, uuid=cart_id, is_active=True)
+                cart = get_object_or_404(Cart, uuid=cart_id)
                 cart.is_selected = is_selected
                 carts.append(cart)
             Cart.objects.bulk_update(carts, ['is_selected'])

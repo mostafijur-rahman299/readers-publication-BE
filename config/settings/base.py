@@ -146,12 +146,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -239,8 +233,8 @@ if DEBUG:
     
 # JWT configuration (optional)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -502,8 +496,19 @@ UNFOLD = {
                     }
                 ]
             },
-            
-           
+            {
+                "title": _("Order"),
+                "separator": False,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Order"),
+                        "icon": "shopping_cart",
+                        "link": reverse_lazy("admin:order_order_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    }
+                ]
+            },
             
         ],
     },

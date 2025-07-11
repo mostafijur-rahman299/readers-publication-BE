@@ -56,7 +56,12 @@ class Book(BaseModel):
     class Meta:
         verbose_name = "Book"
         verbose_name_plural = "Books"
-        ordering = ['-published_date']  
+        ordering = ['-published_date']
+        
+    def get_book_price(self):
+        if self.discounted_price and self.discounted_price > 0:
+            return self.discounted_price
+        return self.price
         
         
 class BookPreview(BaseModel):

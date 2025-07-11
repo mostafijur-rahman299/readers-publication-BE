@@ -34,6 +34,7 @@ urlpatterns = [
     path('author/', include('author.urls')),
     path('cart/', include('cart.urls')),
     path('shipping-address/', include('shipping.urls')),
+    path('order/', include('order.urls')),
     # ckeditor5
     path("ckeditor5/", include('django_ckeditor_5.urls')),
 ]
