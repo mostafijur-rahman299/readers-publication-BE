@@ -95,3 +95,24 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         order.payment = payment
         order.save()
         return order
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'book', 'quantity', 'price']
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    order_items_count = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(format="%d %B %Y")
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'order_id', "status", "created_at", "total_amount", "order_items_count"]
+
+    def get_order_items_count(self, obj):
+        order_items = OrderItem.objects.filter(order=obj).count()
+        return order_items
+
+
