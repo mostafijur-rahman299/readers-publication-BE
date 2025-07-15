@@ -14,10 +14,12 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         status = self.request.query_params.get('status', 'all')
         if status == 'all':
-            return Order.objects.filter(user=self.request.user)
-        
-        print(status)
-        return Order.objects.filter(user=self.request.user, status=status)
+            return Order.objects.filter(user=self.request.user).order_by("-created_at") 
+        return Order.objects.filter(user=self.request.user, status=status).order_by("-created_at")
+    
+    def paginate_queryset(self, queryset):
+        self.pagination_class.page_size = 4
+        return super().paginate_queryset(queryset)
     
     def get_serializer_class(self):
         if self.action == 'list':
@@ -35,4 +37,3 @@ class OrderViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response({"order_id": serializer.data['order_id']}, status=status.HTTP_201_CREATED, headers=headers)
-

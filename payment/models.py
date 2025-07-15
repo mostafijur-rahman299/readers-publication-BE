@@ -68,6 +68,15 @@ class Payment(BaseModel):
             while Payment.objects.filter(payment_id=self.payment_id).exists():
                 self.payment_id = f"{random.randint(1000000, 9999999)}"
         super().save(*args, **kwargs)
+        
+    def get_payment_method_obj(self):
+        if self.payment_method == PaymentMethod.BKASH:
+            return self.bkash_payments.first()
+        elif self.payment_method == PaymentMethod.ROCKET:
+            return self.rocket_payments.first()
+        elif self.payment_method == PaymentMethod.NAGAD:
+            return self.nagad_payments.first()
+        return None
 
 class BkashPayment(BaseModel):
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='bkash_payments')

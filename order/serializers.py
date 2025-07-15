@@ -6,6 +6,7 @@ from .models import OrderItem
 from shipping.models import Shipping
 from core.models import GeneralData
 from django.utils import timezone
+from django.conf import settings
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
@@ -98,9 +99,20 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    book = serializers.SerializerMethodField()
+    
     class Meta:
         model = OrderItem
         fields = ['id', 'book', 'quantity', 'price']
+    
+    def get_book(self, obj):
+        book = obj.book
+        return {
+            "slug": book.slug,
+            "title": book.title,
+            "price": book.get_book_price(),
+            "cover_image": settings.BACKEND_SITE_HOST + book.image.url if book.image else None,
+        }
 
 
 class OrderListSerializer(serializers.ModelSerializer):
@@ -116,3 +128,35 @@ class OrderListSerializer(serializers.ModelSerializer):
         return order_items
 
 
+class OrderDetailSerializer(serializers.ModelSerializer):
+    payment_details = serializers.SerializerMethodField()
+    order_items = OrderItemSerializer(many=True)
+    shipping_address = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'order_id', "status", "sub_total", "shipping_cost", "payment_details", "order_items", "shipping_address"]
+
+    def get_payment_details(self, obj):
+        payment = obj.payment
+        if payment:
+            return {
+                "id": payment.id,
+                "payment_method": payment.payment_method,
+                "payment_status": payment.payment_status,
+                "payment_date": payment.payment_date.strftime("%d %B %Y, %H:%M %p") if payment.payment_date else None,
+                "mobile_number": payment.get_payment_method_obj().mobile_number if payment.get_payment_method_obj() else None,
+                "reference_number": payment.get_payment_method_obj().reference_number if payment.get_payment_method_obj() else None,
+            }
+        return None
+    
+    def get_shipping_address(self, obj):
+        shipping_address = obj.shipping_address
+        return {
+            "id": shipping_address.id,
+            "name": shipping_address.name,
+            "mobile_number": shipping_address.mobile_number,
+            "address": shipping_address.address,
+        }
+    
+    
