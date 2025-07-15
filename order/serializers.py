@@ -111,7 +111,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "slug": book.slug,
             "title": book.title,
             "price": book.get_book_price(),
-            "cover_image": settings.BACKEND_SITE_HOST + book.image.url if book.image else None,
+            "cover_image": settings.BACKEND_SITE_HOST + book.cover_image.url if book.cover_image else None,
         }
 
 
@@ -130,7 +130,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 class OrderDetailSerializer(serializers.ModelSerializer):
     payment_details = serializers.SerializerMethodField()
-    order_items = OrderItemSerializer(many=True)
+    order_items = serializers.SerializerMethodField()
     shipping_address = serializers.SerializerMethodField()
     
     class Meta:
@@ -152,11 +152,29 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     
     def get_shipping_address(self, obj):
         shipping_address = obj.shipping_address
-        return {
-            "id": shipping_address.id,
-            "name": shipping_address.name,
-            "mobile_number": shipping_address.mobile_number,
-            "address": shipping_address.address,
-        }
+        if shipping_address:
+            return {
+                "id": shipping_address.id,
+                "address_type": shipping_address.address_type,
+                "name": shipping_address.name,
+                "phone": shipping_address.phone,
+                "email": shipping_address.email,
+                "state_name": shipping_address.state.name if shipping_address.state else None,
+                "state_name_bn": shipping_address.state.name_bn if shipping_address.state else None,
+                "city_name": shipping_address.city.name if shipping_address.city else None,
+                "city_name_bn": shipping_address.city.name_bn if shipping_address.city else None,
+                "thana_name": shipping_address.thana.name if shipping_address.thana else None,
+                "thana_name_bn": shipping_address.thana.name_bn if shipping_address.thana else None,
+                "union_name": shipping_address.union.name if shipping_address.union else None,
+                "union_name_bn": shipping_address.union.name_bn if shipping_address.union else None,
+                "detail_address": shipping_address.detail_address,
+                "note": shipping_address.note,
+                "courier_service_name": shipping_address.courier_service_name if shipping_address.courier_service_name else None,
+                "courier_service_tracking_id": shipping_address.courier_service_tracking_id if shipping_address.courier_service_tracking_id else None,
+            }
+        return None
     
-    
+    def get_order_items(self, obj):
+        order_items = OrderItem.objects.filter(order=obj)
+        return OrderItemSerializer(order_items, many=True).data
+  

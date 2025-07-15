@@ -26,6 +26,8 @@ class Shipping(BaseModel):
     note = models.TextField(blank=True, null=True)
     is_default = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    courier_service_name = models.CharField(max_length=100, blank=True, null=True)
+    courier_service_tracking_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.name}" if self.user else str(self.name)
