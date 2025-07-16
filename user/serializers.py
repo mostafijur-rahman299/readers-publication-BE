@@ -103,16 +103,22 @@ class UserProfileSerializerRead(serializers.ModelSerializer):
         return instance.user.id
 
 class UserBookWishListSerializerRead(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='book.id')
+    book_id = serializers.IntegerField(source='book.id')
     title = serializers.CharField(source='book.title')
-    author = serializers.CharField(source='book.author.full_name')
+    title_bn = serializers.CharField(source='book.title_bn')
+    author_name = serializers.CharField(source='book.author.name')
+    author_name_bn = serializers.CharField(source='book.author.name_bn')
+    author_id = serializers.IntegerField(source='book.author.id')
+    author_slug = serializers.CharField(source='book.author.slug')
     price = serializers.DecimalField(source='book.price', max_digits=10, decimal_places=2)
-    discount_price = serializers.DecimalField(source='book.discount_price', max_digits=10, decimal_places=2)
+    discount_price = serializers.DecimalField(source='book.discounted_price', max_digits=10, decimal_places=2)
     cover_image = serializers.SerializerMethodField()
+    slug = serializers.CharField(source='book.slug')
 
     class Meta:
         model = BookWishList
-        fields = ['id', 'title', 'author', 'cover_image', 'price', 'discount_price']
+        fields = ['id', 'book_id', 'title', 'title_bn', 'author_name', 'author_name_bn', 'author_id', 'author_slug', 'cover_image', 'price', 'discount_price', 'slug']
 
     def get_cover_image(self, instance):
         return settings.BACKEND_SITE_HOST + instance.book.cover_image.url if instance.book.cover_image else None
+

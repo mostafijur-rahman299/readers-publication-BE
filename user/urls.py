@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/v1/auth/update-password/', UpdatePasswordAPIView.as_view(), name='update-password'),
 
     path('api/v1/user/profile/', UserProfileView.as_view(), name='user-profile'),
-    path('api/v1/user/wishlist/', UserBookWishListAPIView.as_view(), name='user-wishlist'),
+    path('api/v1/wishlist/', UserBookWishListAPIView.as_view(), name='user-wishlist'),
+    path('api/v1/wishlist/<int:id>/', UserBookWishListAPIView.as_view(), name='user-wishlist-delete'),
 ]
