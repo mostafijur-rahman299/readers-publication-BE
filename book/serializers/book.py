@@ -71,6 +71,8 @@ class BookSerializerDetailRead(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
     book_images = serializers.SerializerMethodField()
     has_preview_images = serializers.SerializerMethodField()
+    can_give_review = serializers.SerializerMethodField()
+    is_in_wishlist = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -78,7 +80,7 @@ class BookSerializerDetailRead(serializers.ModelSerializer):
             'id', 'slug', 'title', 'title_bn', "rating", "rating_count",
             "is_available", "price", "discounted_price", "publisher_name", "publisher_website_link",
             "pages", "description", "description_bn", "available_copies", "language", "dimensions",
-            "weight", "published_date", "cover_image", "author", "categories", "book_images", "edition", "has_preview_images"
+            "weight", "published_date", "cover_image", "author", "categories", "book_images", "edition", "has_preview_images", "can_give_review", "is_in_wishlist"
         ]
 
     def get_cover_image(self, obj):
@@ -124,6 +126,14 @@ class BookSerializerDetailRead(serializers.ModelSerializer):
     
     def get_has_preview_images(self, obj):
         return obj.previews.filter(is_active=True).count() > 0
+    
+    def get_can_give_review(self, obj):
+        return obj.user_can_give_review(self.context['request'].user)
+    
+    def get_is_in_wishlist(self, obj):
+        if self.context['request'].user and self.context['request'].user.is_authenticated:
+            return obj.wishlist.filter(user=self.context['request'].user).exists()
+        return False
     
 class BookPreviewSerializerListRead(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(required=False)

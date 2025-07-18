@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from core.models import BaseModel
+from order.models import OrderItem, Order
 from user.models import User
 from django.utils.text import slugify
 from author.models import Author
@@ -62,8 +63,16 @@ class Book(BaseModel):
         if self.discounted_price and self.discounted_price > 0:
             return self.discounted_price
         return self.price
+    
+    def user_can_give_review(self, user):
+        if user.is_authenticated:
+            book_order = OrderItem.objects.filter(book=self, order__user=user, order__status='delivered')
+            if book_order:
+                return not self.reviews.filter(is_active=True, user=user).exists() # if user has already reviewed the book, return False
+        return False
         
-        
+
+# Book Preview Images that will be shown on the book detail page for reading book.
 class BookPreview(BaseModel):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='previews')
     image = models.ImageField(upload_to='book_previews/', blank=True, null=True)

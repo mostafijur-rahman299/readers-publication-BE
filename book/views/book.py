@@ -87,6 +87,11 @@ class BookDetailAPIView(RetrieveAPIView):
     def get_object(self):
         return super().get_object()
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
 
 class BookPreviewAPIView(ListAPIView):
     serializer_class = BookPreviewSerializerListRead

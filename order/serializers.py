@@ -112,6 +112,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "title": book.title,
             "price": book.get_book_price(),
             "cover_image": settings.BACKEND_SITE_HOST + book.cover_image.url if book.cover_image else None,
+            "has_review": book.reviews.filter(is_active=True, user=self.context['request'].user).exists(),
         }
 
 
@@ -176,5 +177,5 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     
     def get_order_items(self, obj):
         order_items = OrderItem.objects.filter(order=obj)
-        return OrderItemSerializer(order_items, many=True).data
+        return OrderItemSerializer(order_items, many=True, context=self.context).data
   

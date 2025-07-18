@@ -1,6 +1,6 @@
 from django.urls import path
 from user.views import UserRegistrationAPIView, GoogleLoginView, ForgotPasswordAPIView, \
-    UpdatePasswordAPIView, UserProfileView, UserBookWishListAPIView
+    UpdatePasswordAPIView, UserProfileView, UserBookWishListAPIView, UserReviewsView    
 
 urlpatterns = [
     path('api/v1/auth/registration/', UserRegistrationAPIView.as_view(), name='user-registration'),
@@ -10,5 +10,6 @@ urlpatterns = [
 
     path('api/v1/user/profile/', UserProfileView.as_view(), name='user-profile'),
     path('api/v1/wishlist/', UserBookWishListAPIView.as_view(), name='user-wishlist'),
-    path('api/v1/wishlist/<int:id>/', UserBookWishListAPIView.as_view(), name='user-wishlist-delete'),
+    path('api/v1/wishlist/<str:id>/', UserBookWishListAPIView.as_view(), name='user-wishlist-delete'),
+    path('api/v1/reviews/', UserReviewsView.as_view(), name='user-reviews'),
 ]

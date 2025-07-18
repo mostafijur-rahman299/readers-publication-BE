@@ -37,7 +37,11 @@ class UserBookWishListAPIView(APIView):
     def delete(self, request, id):
         try:
             user = request.user
-            book_wishlist = BookWishList.objects.get(user=user, id=id)
+            if "book_" in id:
+                book_id = id.split("_")[1]
+                book_wishlist = BookWishList.objects.get(user=user, book_id=book_id)
+            else:
+                book_wishlist = BookWishList.objects.get(user=user, id=id)
             book_wishlist.delete()
             return Response("Book removed from wishlist successfully", status=status.HTTP_204_NO_CONTENT)
         except Exception as e:

@@ -6,8 +6,8 @@ from django.core.exceptions import ValidationError
 
 
 class BookWishList(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='wishlist')
 
     def __str__(self):
         return f"{self.user.email} - {self.book.title}"

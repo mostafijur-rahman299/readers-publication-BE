@@ -1,8 +1,6 @@
 import random
-import string
 from django.db import models
 
-from book.models import Book
 from core.models import BaseModel
 from user.models import User
 from shipping.models import Shipping
@@ -46,7 +44,7 @@ class Order(BaseModel):
 
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='items')
+    book = models.ForeignKey("book.Book", on_delete=models.CASCADE, related_name='items')
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 

@@ -1,3 +1,4 @@
+from book.models import BookReview
 import phonenumbers
 from rest_framework import serializers
 from django.conf import settings
@@ -58,7 +59,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         
         return user
-
 
 class UserProfileSerializerRead(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -122,3 +122,62 @@ class UserBookWishListSerializerRead(serializers.ModelSerializer):
     def get_cover_image(self, instance):
         return settings.BACKEND_SITE_HOST + instance.book.cover_image.url if instance.book.cover_image else None
 
+class UserReviewsSerializerRead(serializers.ModelSerializer):
+    book = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = BookReview
+        fields = ['id', 'book', 'review', 'rating', 'created_at'] 
+
+    def get_book(self, instance):
+        return {
+            "id": instance.book.id,
+            "title": instance.book.title,
+            "title_bn": instance.book.title_bn,
+            "slug": instance.book.slug,
+            "cover_image": settings.BACKEND_SITE_HOST + instance.book.cover_image.url if instance.book.cover_image else None,
+            "author_name": instance.book.author.name,
+            "author_name_bn": instance.book.author.name_bn,
+            "author_slug": instance.book.author.slug,
+        }
+    
+    def get_created_at(self, instance):
+        return instance.created_at.strftime("%d %b, %Y")
+    
+class UserProfileSerializerUpdate(serializers.ModelSerializer):
+    full_name = serializers.CharField(source='user.full_name')
+    email = serializers.CharField(source='user.email')
+    phone_number = serializers.CharField(source='user.phone_number')
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
+    
+    class Meta:
+        model = UserProfile
+        fields = ['full_name', 'email', 'phone_number', 'profile_picture']
+        extra_kwargs = {
+            'full_name': {'required': True},
+            'email': {'required': True},
+            'phone_number': {'required': True},
+        }
+        
+    def update(self, instance, validated_data):
+        # Pop the nested user data
+        user_data = validated_data.pop('user', {})
+
+        # Update user fields
+        user = instance.user
+        user.full_name = user_data.get('full_name', user.full_name)
+        user.email = user_data.get('email', user.email)
+        user.phone_number = user_data.get('phone_number', user.phone_number)
+        user.save()
+
+        # Update profile_picture (which is stored in UserProfile)
+        profile_picture = validated_data.get('profile_picture')
+        
+        if profile_picture:
+            instance.profile_picture = profile_picture
+
+        instance.save()
+        return instance
+
+    
