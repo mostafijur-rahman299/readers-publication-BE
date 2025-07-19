@@ -1,8 +1,10 @@
 from django.db import models
 from core.models import BaseModel
 from django_ckeditor_5.fields import CKEditor5Field
+from django.utils.text import slugify
 
 class Blog(BaseModel):
+    slug = models.SlugField(unique=True, null=True, blank=True)
     author_name = models.CharField(max_length=255, null=True)
     author_name_bn = models.CharField(max_length=255, null=True, blank=True)
     author_image = models.ImageField(upload_to='blog_images/', null=True, blank=True)
@@ -28,4 +30,12 @@ class Blog(BaseModel):
     def save(self, *args, **kwargs):
         if not self.index_number:
             self.index_number = Blog.objects.count() + 1
+            
+        if not self.slug:
+            while True:
+                slug = slugify(self.title)
+                if not Blog.objects.filter(slug=slug).exists():
+                    self.slug = slug[:45]
+                    break
+            
         return super().save(*args, **kwargs)

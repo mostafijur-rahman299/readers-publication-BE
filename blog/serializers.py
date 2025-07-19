@@ -16,6 +16,7 @@ class BlogSerializerListRead(serializers.ModelSerializer):
         model = Blog
         fields = [
             'id',
+            'slug',
             'title',
             'title_bn',
             'subtitle',
@@ -28,10 +29,17 @@ class BlogSerializerListRead(serializers.ModelSerializer):
             'published_date'
         ]
 
+from django.conf import settings
+import re
+from rest_framework import serializers
+from .models import Blog
+
 class BlogSerializerDetailRead(serializers.ModelSerializer):
     cover_image = serializers.SerializerMethodField()
     published_date = serializers.SerializerMethodField()
     author_image = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
+    content_bn = serializers.SerializerMethodField()
 
     def get_cover_image(self, obj):
         return f"{settings.BACKEND_SITE_HOST}{obj.cover_image.url}" if obj.cover_image else None
@@ -42,10 +50,31 @@ class BlogSerializerDetailRead(serializers.ModelSerializer):
     def get_author_image(self, obj):
         return f"{settings.BACKEND_SITE_HOST}{obj.author_image.url}" if obj.author_image else None
     
+    def get_content(self, obj):
+        if obj.content:
+            # Replace relative media URLs with full backend host URL
+            return re.sub(
+                r'src="/media/([^"]+)"',
+                f'src="{settings.BACKEND_SITE_HOST}/media/\\1"',
+                obj.content
+            )
+        return None
+    
+    def get_content_bn(self, obj):
+        if obj.content_bn:
+            # Replace relative media URLs with full backend host URL
+            return re.sub(
+                r'src="/media/([^"]+)"',
+                f'src="{settings.BACKEND_SITE_HOST}/media/\\1"',
+                obj.content_bn
+            )
+        return None
+
     class Meta:
         model = Blog
         fields = [
             'id',
+            'slug',
             'title',
             'title_bn',
             'subtitle',
